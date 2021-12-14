@@ -1,1 +1,2 @@
-DO NOT push the data file to repo as it is too large
+DO NOT push the data folder to repo as it is too large.
+gitignore should have data/
