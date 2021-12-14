@@ -73,7 +73,7 @@ def main():
 
     cycle_gan_model.load_weights(checkpoint)
 
-    col_dir = '../data/test_images_jpg/*.jpg'
+    col_dir = '../data/test_photos_jpg/*.jpg'
     col = imread_collection(col_dir)
     for img in col:
         image = (tf.cast(img, tf.float32) / 127.5) - 1
