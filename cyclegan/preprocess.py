@@ -34,7 +34,8 @@ def get_data():
 
 def decode_image(image):
     image = tf.image.decode_jpeg(image, channels=3)
-    image = (tf.cast(image, tf.float32) / 127.5) - 1
+    image = (tf.cast(image, tf.float32) / 127.5) - \
+        1  # Map values in the range [-1, 1]
     image = tf.reshape(image, [*IMAGE_SIZE, 3])
     return image
 
