@@ -66,40 +66,76 @@ def return_generator():
 
     checkpoint_dir = '../checkpoints/'
     checkpoint = tf.train.latest_checkpoint(checkpoint_dir)
-
     cycle_gan_model.load_weights(checkpoint).expect_partial()
 
     return monet_generator
 
-def monet_frame(image, generator):
+def monet_frame(image, generator, output=""):
     image = np.expand_dims(image, axis=0)
     result = np.array(generator(image))
-
-    cv2.imshow("monet", result[0])
+    cv2.namedWindow("Monet", cv2.WINDOW_KEEPRATIO)
+    cv2.imshow("Monet", result[0])
+    cv2.resizeWindow("Monet", 512, 512)
     return
 
 def main():
     if len(os.sys.argv) < 2 or os.sys.argv[1] == "":
-        print("usage: python path-to-image-frames-directory")
+        print("usage: python webcam/video")
+        if len(os.sys.argv) == 3 and os.sys.argv[2] == "":
+            print("usage: python video path-to-image-frames-directory")
         exit()
 
-    def convert_cam_frames_to_video(generator):
+    def convert_cam_frames_to_monet(generator):
         while True:
             video = cv2.VideoCapture(0)
             _ret_val, img = video.read()
             img = cv2.flip(img, 1)
             img = cv2.resize(img, (256, 256))
+
+            normalization_layer = tf.keras.layers.Rescaling(scale=1./127.5, offset=-1)
+            frame_nor = normalization_layer(img)
+            monet_frame(frame_nor, generator)
             cv2.imshow('my webcam', img)
-            monet_frame(img, generator)
-            if cv2.waitKey(1) == 27:
+            
+            if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         cv2.destroyAllWindows()
 
+    def convert_video_frames_to_monet(generator, path):
+        cap = cv2.VideoCapture(path)
+
+        if (cap.isOpened() == False):
+            print("Error opening video stream or file")
+        count = 0
+        # only monet every 60 frames
+        while(cap.isOpened()):
+            if count % 60 == 0:
+                print(count)
+                ret_val, img = cap.read()
+                if ret_val:
+                    img = cv2.resize(img, (256, 256))
+
+                    normalization_layer = tf.keras.layers.Rescaling(scale=1./127.5, offset=-1)
+                    frame_nor = normalization_layer(img)
+                    monet_frame(frame_nor, generator)
+                    cv2.namedWindow("Video", cv2.WINDOW_KEEPRATIO)
+                    cv2.imshow("Video", img)
+                    cv2.resizeWindow("Video", 512, 512)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        break
+                else:
+                    break
+        cv2.destroyAllWindows()
+        cap.release()
+
     if os.sys.argv[1] == "webcam":
         generator = return_generator()
-        convert_cam_frames_to_video(generator)
+        convert_cam_frames_to_monet(generator)
     
-    # if os.sys.argv[1] == "video":
+    if os.sys.argv[1] == "video":
+        generator = return_generator()
+        convert_video_frames_to_monet(generator, os.sys.argv[2])
+
     
 if __name__ == "__main__":
     main()

@@ -12,3 +12,25 @@ You can run the base code in two ways:
 test.py has code that can pull in saved weights.
 
 Other colab notebooks can be run too to experiment with different artists and datasets.
+
+## Video output on trained model
+
+To run the model weights to convert a normal video to monet style video:
+
+```python
+    cd video-lib
+    python main.py video path-to-video
+```
+
+For webcam:
+
+```python
+    cd video-lib
+    python main.py webcam
+```
+
+NOTE: works best on nature/scenery video frames
+
+For reference, there's already a generated video in video-lib:
+
+[Watch the video](https://drive.google.com/file/d/1hbPl5qvVE-T613iPyFf_LHhV1_DZuXzb/view?usp=sharing)
